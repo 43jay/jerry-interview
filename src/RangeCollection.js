@@ -13,20 +13,17 @@ class RangeCollection {
   }
 
   /**
-   * Adds a range to the collection
+   * Adds a range to the collection.
+   * Loop through existing intervals, merging and removing any overlapping intervals with the interval to be
+   * inserted.
    * @param {Array<number>} range - Array of two integers that specify beginning and end of range.
    */
   add(range) {
-    let insertRange = new Range(range[0], range[1]);
+    range = new Range(range[0], range[1]);
+    let { rangesToRemove, insertRange } = this._mergeRange(range);
 
-    const elementsToRemove = [];
-    insertRange = this._mergeRange(elementsToRemove, insertRange);
+    this.priorityQueue.removeMany(value => rangesToRemove.has(value));
 
-    this.priorityQueue.removeMany(
-      value => elementsToRemove.indexOf(value) != -1
-    );
-
-    // Make sure to re-add merged interval.
     this.priorityQueue.add(insertRange);
   }
 
@@ -35,17 +32,17 @@ class RangeCollection {
    * @param {Array} elementsToRemove Track ranges which must be removed from collection
    * @param {Range} insertRange Range which is being inserted.
    */
-  _mergeRange(elementsToRemove, insertRange) {
-    this.priorityQueue.forEach((value, index) => {
+  _mergeRange(insertRange) {
+    const rangesToRemove = new Set();
+    this.priorityQueue.forEach(value => {
       // Check whether this value conflicts with provided range. If so, merge it in.
       if (value.overlaps(insertRange)) {
         insertRange.merge(value);
-        elementsToRemove.push(value);
-      } else if (value.start > insertRange.end) {
-        return insertRange;
+        rangesToRemove.add(value);
       }
     });
-    return insertRange;
+
+    return { insertRange, rangesToRemove };
   }
 
   /**
@@ -56,38 +53,48 @@ class RangeCollection {
   remove(range) {
     let removalRange = new Range(range[0], range[1]);
 
-    // Loop over collection, applying update logic.
-    const elementsToRemove = [];
-    this._removeRange(elementsToRemove, removalRange);
+    let { rangesToRemove, rangesToAdd } = this._removeRange(removalRange);
 
-    this.priorityQueue.removeMany(
-      value => elementsToRemove.indexOf(value) != -1
-    );
+    this.priorityQueue.removeMany(value => rangesToRemove.has(value));
+    rangesToAdd.forEach(newRange => this.priorityQueue.add(newRange));
   }
 
-  _removeRange(elementsToRemove, removalRange) {
-    this.priorityQueue.forEach((value, index) => {
-      //
-      if (value.overlaps(removalRange)) {
-        const isEmpty = value.complementMerge(removalRange);
-        if (isEmpty) {
-          elementsToRemove.push(value);
-        }
-      } else if (value.start > insertRange.end) {
-        return insertRange;
+  /**
+   * @returns {Object} Object containing Set of existing ranges to be removed, along with an Array
+   * of the new ranges to be added.
+   * @param {Range} removalRange Range to be removed from Collection.
+   */
+  _removeRange(removalRange) {
+    const rangesToRemove = new Set();
+    const rangesToAdd = [];
+    this.priorityQueue.forEach(existingRange => {
+      // Check for existing ranges that overlap, and calculate their new range.
+      if (existingRange.overlaps(removalRange)) {
+        this._splitRange(existingRange, removalRange).forEach(newRange => {
+          rangesToAdd.push(newRange);
+        });
+        rangesToRemove.add(existingRange);
       }
     });
+
+    return { rangesToRemove, rangesToAdd };
   }
 
   /**
    * Splits range and returns list of new ranges.
    * Can return up to 2 new ranges in cases where input range is split in 2.
-   * @returns List of new valid ranges after the split
-   * @param {Range} range Range over which to split
+   * Can return 0 ranges in cases where splitRange covers input range.
+   * @returns List of new valid ranges after the split.
+   * @param {Range} range Range over which to split.
    * @param {Range} splitRange Range defining interval to remove.
    */
   _splitRange(range, splitRange) {
     const splitRanges = [];
+    // `splitRange` falls outside.
+    if (range.end <= splitRange.start || range.start >= splitRange.end) {
+      splitRanges.push(new Range(range.start, range.end));
+      return splitRanges;
+    }
     // `splitRange` covers lesser part.
     if (range.end > splitRange.end) {
       splitRanges.push(new Range(splitRange.end, range.end));
@@ -96,22 +103,23 @@ class RangeCollection {
     if (range.start < splitRange.start) {
       splitRanges.push(new Range(range.start, splitRange.start));
     }
-    // `splitRange` falls outside.
-    if (range.start < splitRange.start && range.end < splitRange.end) {
-      splitRanges.push(new Range(range.start, range.end));
-    }
     return splitRanges;
   }
 
   /**
-   * Prints out the list of ranges in the range collection
+   * Prints out the list of ranges in the range collection.
+   * @param logToConsole True to output via console.log. False to return output as string.
    */
-  print() {
+  print(logToConsole = true) {
     let outputBuilder = "";
     this.priorityQueue.forEach(
-      value => (outputBuilder += `[${value.start},${value.end}) `)
+      value => (outputBuilder += `[${value.start}, ${value.end}) `)
     );
-    console.log(outputBuilder);
+    if (logToConsole) {
+      console.log(outputBuilder);
+    } else {
+      return outputBuilder;
+    }
   }
 }
 
