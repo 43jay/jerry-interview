@@ -1,8 +1,13 @@
 ## Build Project
+
 `yarn build`
 
-Currently project doesn't use webpack (overkill). This may change in the future.  
-For now we use babel-cli to output RangeCollection into the lib folder, where it is linked in from index.html  
+## Implementation notes
 
+The sample code provided used the es6 class syntax, so this project does same, using webpack to bundle output for the browser.
 
+There's a main.js entrypoint which runs the test commands and can be verified in the browser.
 
+The surface area of the API was left as provided. However, a good practice would be to type the interface to avoid programmer error & allow for better autocomplete within IDE.
+
+FastPriorityQueue is used to store the ranges within RangeCollection as a convenience for print(). It is not expected to improve the worst-case runtime, and indeed FastPriorityQueue.forEach `clone`'s the queue, which is O(N).
