@@ -2,13 +2,13 @@
   "name": "jerry-interview",
   "version": "1.0.0",
   "description": "A simple npm project to submit for the Jerry (getjerry.com) take home interview",
-  "main": "index.js",
   "author": "Matthew Jay Williams",
   "license": "MIT",
   "private": true,
   "scripts": {
     "build": "babel src -d lib"
   },
+  "main": "src/index.js",
   "dependencies": {
     "fastpriorityqueue": "^0.6.1"
   },
@@ -16,6 +16,8 @@
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
-    "npx": "^10.2.0"
+    "npx": "^10.2.0",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
   }
 }
