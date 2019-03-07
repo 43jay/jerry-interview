@@ -2,7 +2,6 @@ import RangeCollection from "./RangeCollection";
 
 console.log(" Example run");
 const rc = new RangeCollection();
-console.log("hey gir");
 
 rc.add([1, 5]);
 rc.print();
@@ -27,9 +26,6 @@ console.log(" Should display: [1, 5) [10, 21)");
 rc.add([3, 8]);
 rc.print();
 console.log(" Should display: [1, 8) [10, 21)");
-
-// =========
-console.log("STARTING TO REMOVE");
 
 rc.remove([10, 10]);
 rc.print();
