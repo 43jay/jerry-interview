@@ -6,9 +6,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "webpack --config webpack.config.js --watch --mode=development"
   },
-  "main": "src/index.js",
   "dependencies": {
     "fastpriorityqueue": "^0.6.1"
   },
@@ -16,7 +15,7 @@
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.4",
     "@babel/preset-env": "^7.3.4",
-    "npx": "^10.2.0",
+    "babel-loader": "^8.0.5",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   }

@@ -2,6 +2,8 @@
 
 `yarn build`
 
+This will automatically rebuild dependencies when source changes.
+
 ## Implementation notes
 
 The sample code provided used the es6 class syntax, so this project does same, using webpack to bundle output for the browser.
