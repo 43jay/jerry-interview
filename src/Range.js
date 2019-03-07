@@ -1,18 +1,20 @@
 /**
- * Represents a (open-bounded) range.
+ * Represents a [inclusive, exclusive) range.
  */
 class Range {
   constructor(start, end) {
     if (!this._validate(start, end)) {
-      throw new Error(`Invalid range parameters. ${start} ${end}`);
+      throw new Error(
+        `Invalid range parameters: start='${start}' end='${end}'`
+      );
     }
-
     this.start = start;
     this.end = end;
   }
 
   /**
-   * True if provided range overlaps with this one.
+   * @returns true if provided range overlaps with this one.
+   * @param {Range} otherRange Range to test inclusion against.
    */
   overlaps(otherRange) {
     return (
@@ -25,7 +27,7 @@ class Range {
   /**
    * Merge otherRange into this, such that this one is the union of the two
    * ranges.
-   * @param {*} otherRange
+   * @param {Rage} otherRange Range to merge into this one.
    */
   merge(otherRange) {
     if (otherRange.start < this.start) {
